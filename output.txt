@@ -1,0 +1,57 @@
+./allocation_optmizer entradaProj2TAG.txt
+------------------------------------------------
+Alocacao de professores
+
+E1 -> P72 
+E2 -> P99 
+E3 -> P1 
+E4 -> P97 
+E5 -> P96 
+E6 -> P47 
+E7 -> P10 
+E8 -> P60 
+E9 -> P92 
+E10 -> P21 P2 
+E11 -> P90 P40 
+E12 -> P5 P45 
+E13 -> P25 P50 
+E14 -> P100 P87 
+E15 -> P61 
+E16 -> P85 P51 
+E17 -> P84 
+E18 -> P31 
+E19 -> P82 
+E20 -> P15 P11 
+E21 -> P80 P9 
+E22 -> P79 
+E23 -> P78 
+E24 -> P77 
+E25 -> P76 
+E26 -> P75 P81 
+E27 -> P74 P6 
+E28 -> P28 P73 
+E29 -> P13 P3 
+E30 -> P22 P23 
+E31 -> P70 P14 
+E32 -> P69 P4 
+E33 -> P68 P7 
+E34 -> P67 P34 
+E35 -> P18 P71 
+E36 -> P65 P91 
+E37 -> P64 P37 
+E38 -> P63 P38 
+E39 -> P39 P62 
+E40 -> P33 P41 
+E41 -> P19 P8 
+E42 -> P59 
+E43 -> P20 P58 
+E44 -> P57 
+E45 -> P29 P30 
+E46 -> P46 P55 
+E47 -> P54 P95 
+E48 -> P53 
+E49 -> P35 
+E50 -> P32 P36 
+------------------------------------------------
+Numero de professores alocados estável máximo: 79
+

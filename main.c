@@ -1,3 +1,5 @@
+// Ruan Petrus
+// 2022-1
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -7,6 +9,7 @@
 #include <stdbool.h>
 
 
+// Representa a strutura de um professor
 typedef struct {
   int cap;
   int pref[4];
@@ -14,6 +17,7 @@ typedef struct {
 } Professor;
 
 
+// Rpresenta a estrutura de uma escola
 typedef struct {
   int size;
   int pref[2];
@@ -26,14 +30,64 @@ typedef struct {
 Professor professor_array[PROFESSOR_size] = {0};
 Escola escola_array[ESCOLA_size] = {0};
 
+// Implementam uma estrutara de fila
+#define QUEUE_SIZE 1024
+int QUEUE[QUEUE_SIZE] = {0};
+int Rear = - 1;
+int Front = - 1;
+int queue_counter = 0;
 
-void usage(FILE *stream)
-{
+// Representa um array relacinando professores com capacidades
+int CAP_LIST_COUNTER[4] = {0};
+int CAP_LIST[4][PROFESSOR_size] = {0};
+int ESCOLA_COUNTER[ESCOLA_size] = {0};
+
+// Adiciona um elemento na fila
+void push(int insert_item){
+
+    if (Rear == QUEUE_SIZE - 1)
+       printf("Overflow \n");
+    else {
+        if (Front == - 1)
+      
+        Front = 0;
+        Rear = Rear + 1;
+        QUEUE[Rear] = insert_item;
+        queue_counter += 1;
+    }
+} 
+ 
+// Retira um elemento da fila
+int pop(void){
+  if (Front == - 1 || Front > Rear) { 
+      printf("Underflow \n");
+      return 0;
+  }
+  else {
+      queue_counter -= 1; 
+      int item = QUEUE[Front];
+      Front = Front + 1;
+      return item;
+  }
+}
+
+// Cria uma lista relacionando a capacidade com o professor
+void create_cap_list(void) {
+  for(int i = 1; i < PROFESSOR_size; i++) {
+    if (professor_array[i].signed_to != 0) continue;
+    int cap = professor_array[i].cap;
+    CAP_LIST[cap][CAP_LIST_COUNTER[cap]] = i;
+    CAP_LIST_COUNTER[cap] += 1;
+  }
+}
+
+// Printa no stream como utilizar o programa
+void usage(FILE *stream){
     fprintf(stream, "USAGE: program_name <input_file_path>\n");
 }
 
-char *slurp_file(const char *file_path, size_t *size)
-{
+// Le um arquivo e devolve o conteudo em forma de string
+char *slurp_file(const char *file_path, size_t *size){
     char *buffer = NULL;
 
     FILE *f = fopen(file_path, "rb");
@@ -90,8 +144,8 @@ error:
     return NULL;
 }
 
-char *strstrip(char *s)
-{
+// Retira os espaços na frente e atras de uma string
+char *strstrip(char *s){
         size_t size;
         char *end;
 
@@ -111,10 +165,10 @@ char *strstrip(char *s)
         return s;
 }
 
-void print_professor_array(void)
-{
+// Printa a array de professores
+void print_professor_array(void){
   for(size_t i = 1; i < PROFESSOR_size; ++i) {
-    printf("P%zu (%d) -> ", i, professor_array[i].cap);
+    printf("P%zu : E%d -> ", i, professor_array[i].signed_to);
     
     for(size_t j = 0; j < 4; ++j) {
       printf("E%d, ", professor_array[i].pref[j]);
@@ -123,29 +177,32 @@ void print_professor_array(void)
   }
 }
 
-void print_escola_array(void)
-{
+// Printa a array de escolas
+void print_escola_array(void){
+  printf("------------------------------------------------\n");
+  printf("Alocacao de professores\n");
+  printf("\n");
   int professor_counter = 0; 
   for(size_t i = 1; i < ESCOLA_size; ++i) {
-    printf("E%zu(%d)(%d) -> ", i, escola_array[i].pref[0], escola_array[i].pref[1]);
+    printf("E%zu -> ", i);
     
     for(size_t j = 0; j < 2; ++j) {
       int sin = escola_array[i].signed_to[j];
       if (sin == 0){
-        printf("0, ");
         continue;
       } 
       professor_counter += 1;
-      printf("%d(%d), ", sin, professor_array[sin].cap);
+      printf("P%d ", sin);
     }
     printf("\n");
   }
-  printf("Number of professors: %d\n", professor_counter);
+  printf("------------------------------------------------\n");
+  printf("Numero de professores alocados estável máximo: %d\n", professor_counter);
+  printf("\n");
 }
 
-
-void generate_graph(char* content)
-{
+// Cria as estruturas de dados através da string
+void generate_graph(char* content){
   char *curLine = content;
   while(curLine){
     char *nextLine = strchr(curLine, '\n');
@@ -223,156 +280,7 @@ void generate_graph(char* content)
   return;
 }
 
-
-// Count non zero elements in array
-int array_size(int *array, int size) {
-  int counter = 0;
-
-  for(int i = 0; i < size; i++) {
-    if (array[i] != 0){
-      counter++;
-    }
-  }
-  return counter;
-}
-#define STACK_SIZE 101
-int STACK[STACK_SIZE] = {0};
-int stack_counter = 0;
-
-void push(int a) {
-  assert(stack_counter < STACK_SIZE);
-  STACK[stack_counter] = a;
-  stack_counter += 1;
-}
-
-int pop(void) {
-  assert(stack_counter > 0);
-  stack_counter -= 1; 
-  return STACK[stack_counter];
-}
-
-bool prefer_new(Escola *escola, Professor *new_professor, Professor *old_professor, int n) {
-
-  bool new = new_professor->cap >= escola->pref[n];
-  bool old = old_professor->cap >= escola->pref[n];
-
-  if (!old && new) {
-    return true;
-  }
-
-  if (new && new_professor->cap < old_professor->cap) {
-    return true;
-  }
-
-  return false;
-}
-int CAP_LIST_COUNTER[4] = {0};
-int CAP_LIST[4][PROFESSOR_size] = {0};
-int ESCOLA_COUNTER[ESCOLA_size] = {0};
-
-void create_cap_list(void) {
-  for(int i = 1; i < PROFESSOR_size; i++) {
-    if (professor_array[i].signed_to != 0) continue;
-    int cap = professor_array[i].cap;
-    CAP_LIST[cap][CAP_LIST_COUNTER[cap]] = i;
-    CAP_LIST_COUNTER[cap] += 1;
-  }
-}
-
-void initialize_escola_counter(void) {
-  for (int i = 1; i < ESCOLA_size; i++) {
-    ESCOLA_COUNTER[i] = 0;
-  }
-}
-
-void intitizalize_stack_with_escolas(void) {
-  for(int i = 1; i < ESCOLA_size; i++) {
-    push(i);
-  }
-}
-
-int get_escola_minor_prefer_capacity(Escola *escola) {
-  int first = escola->pref[0];
-  int second = escola->pref[1];
-
-  if (second == 0) return 0;
-  if (first < second) return 0;
-  return 1;
-}
-
-int get_index_in_professor_pref(int escola, int pref[4]) {
-  for (int i = 0; i < 4 ; i++) {
-    if (pref[i] == escola) return i + 1;
-  }
-  return 0;
-}
-
-bool prefer_new_escola(int new_escola_index, Professor *professor) {
-  int old_escola_index = professor->signed_to;
-  
-  int old_order = get_index_in_professor_pref(old_escola_index, professor->pref);
-  int new_order = get_index_in_professor_pref(new_escola_index, professor->pref);
-
-  if (new_order == 0) return false;
-  if (old_order == 0) return true;
-  if (new_order < old_order) return true;
-  return false;
-}
-
-
-void match_graphs2(void) {
-  // Initializing Stuff
-  create_cap_list();
-  initialize_escola_counter();
-  intitizalize_stack_with_escolas();
-
-  while(stack_counter > 0) {
-    int escola_index = pop();
-
-    Escola *escola = &escola_array[escola_index];
-    int minor_prefer_cap = get_escola_minor_prefer_capacity(escola);
-    int prefer_cap = escola->pref[minor_prefer_cap];
-    int escola_counter = ESCOLA_COUNTER[escola_index];
-    int prefer_p_index = CAP_LIST[prefer_cap][escola_counter];
-    
-    bool found = false;
-    while (prefer_cap <= 3) {
-      escola_counter = ESCOLA_COUNTER[escola_index];
-      prefer_p_index = CAP_LIST[prefer_cap][escola_counter];
-      if (prefer_p_index == 0) {
-        prefer_cap += 1;
-        ESCOLA_COUNTER[escola_index] = 0;
-        prefer_p_index = CAP_LIST[prefer_cap][escola_counter];
-        if (prefer_cap > 3) continue;
-      }
-
-      Professor *prefer_professor = &professor_array[prefer_p_index];
-
-      if (prefer_professor->signed_to == 0) {
-        prefer_professor->signed_to = escola_index;
-        escola->signed_to[minor_prefer_cap] = prefer_p_index;
-        found = true;
-      }
-      else if (prefer_new_escola(escola_index, prefer_professor)) {
-        int old_escola_index = prefer_professor-> signed_to;
-        prefer_professor->signed_to = escola_index;
-        escola->signed_to[minor_prefer_cap] = prefer_p_index;
-
-        Escola *old_escola = &escola_array[old_escola_index];
-        old_escola->signed_to[0] = 0;
-        old_escola->signed_to[1] = 0;
-
-        push(old_escola_index);
-        found = true;
-      }
-      else {
-        ESCOLA_COUNTER[escola_index] += 1;
-      }
-    }
-  }
-}
-
-// Get first non zero element
+// Retorna o primeiro elemento que não é zero
 int get_first(int array[4]) {
   for (int i = 0 ; i < 4; i++) {
     if (array[i] != 0) return array[i];
@@ -380,6 +288,7 @@ int get_first(int array[4]) {
   return 0;
 }
 
+// Faz o primeiro elemento que nao é zero ser zero
 void delete_first(int *array) {
   for (int i = 0; i < 4; i++)  {
     if (array[i] != 0) {
@@ -390,6 +299,7 @@ void delete_first(int *array) {
   return ;
 }
 
+// Olha se tem espaço dentro de escola
 bool check_if_escola_has_espace(Escola *escola, Professor *professor) {
   int size = escola->size;
   
@@ -399,7 +309,7 @@ bool check_if_escola_has_espace(Escola *escola, Professor *professor) {
   return false;
 }
 
-
+// Verica se o professor tem a capacidade de trabalhar na escola
 bool can_work_in_school(Escola *escola, Professor *professor) {
   int prof_cap = professor->cap;
   int escola_size = escola->size;
@@ -411,6 +321,7 @@ bool can_work_in_school(Escola *escola, Professor *professor) {
   
 }
 
+// Verifica se o novo professor é melhor que algum dos antigos
 bool check_if_new_professor_is_better(Escola *escola, Professor *professor) {
   for (int i =0; i < escola->size; i++) {
     int old_index = escola->signed_to[i];
@@ -421,6 +332,7 @@ bool check_if_new_professor_is_better(Escola *escola, Professor *professor) {
   return false;
 }
 
+// Verifica se o novo professor é melhor que o professor na posicao do index
 bool check_if_new_professor_is_better_index(Escola *escola, Professor *professor, int index) {
   int old_index = escola->signed_to[index];
   Professor *old_professor = &professor_array[old_index];
@@ -429,12 +341,14 @@ bool check_if_new_professor_is_better_index(Escola *escola, Professor *professor
   return false;
 }
 
+// Faz o match máximo e estavel do grafico
 void match_graphs(void) {
-  for(int i = PROFESSOR_size - 1; i >=1 ;i--) {
+  // Inicializa a fila
+  for(int i = 1; i < PROFESSOR_size; i++) {
     push(i);
   }
-
-  while(stack_counter > 0) {
+  // Algorimtmo de match estavel
+  while(queue_counter > 0) {
     int current_professor_index = pop();
     Professor *current_professor = &professor_array[current_professor_index];
 
@@ -483,40 +397,10 @@ void match_graphs(void) {
     }
   }
 
-  // Adicionando um professor para todas as escolas
-  // Checking if hava enough professor with 3 certificates
-  // int n_3_escolas_certificates = 0;
-  // for (int i = 1; i < ESCOLA_size; i++) {
-  //   Escola *escola = &escola_array[i];
-  //   if (escola->signed_to[0] == 0 && escola->pref[0] == 3) {
-  //        n_3_escolas_certificates += 1;
-  //   }
-  // }
-  // int n_3_professor_certificates = 0;
-  // for (int i = 1; i < PROFESSOR_size; i++) {
-  //   Professor *professor = &professor_array[i];
-  //   if (professor->signed_to == 0 && professor->cap == 3) {
-  //        n_3_professor_certificates += 1;
-  //   }
-  // }
-  // if (n_3_escolas_certificates > n_3_professor_certificates) {
-  //   // Adding new professor 3
-  //   for (int i = 1; i < ESCOLA_size; i++) {
-  //     Escola *escola = &escola_array[i];
-  //     if (escola->signed_to[0] != 0 && escola->pref[0] == 3 &&
-  //         escola->signed_to[1] != 0 && escola->pref[1] == 3) {
-  //         int professor_index = escola->signed_to[1];
-  //         escola->signed_to[1] = 0;
-  //         Professor *professor = &professor_array[professor_index];
-  //         professor->signed_to = 0;
-  //     }
-  //   }
-  // }
-
-  // Alocando para as escolas vazias
-  // Creating list of professor with capacities
+  // Cria a lista de capaciadades
   create_cap_list();
 
+  // Adicionando um professor para todas as escolas
   for (int j = 3; j >= 1; j--) {
     int counter = 0;
     for (int i = 1; i < ESCOLA_size; i++) {
@@ -533,22 +417,29 @@ void match_graphs(void) {
     }
   }
 
-  printf("-------------------------------\n\n");
-  int aux_counter = 0;
-  for (int i = 1 ; i < PROFESSOR_size; i++) {
-    Professor *professor = &professor_array[i];
-    if (professor->signed_to == 0) {
-      aux_counter += 1;
-      printf("P%d(%d)\n", i, professor->cap);
+  // Adiciona o resto dos professores onde possivel
+  for (int k = 3; k >= 1; k--) {
+    for (int j = 1; j < PROFESSOR_size; j++) {
+      Professor *professor = &professor_array[j];
+      bool has_been_signed = false;
+      if (professor->signed_to == 0 && professor->cap == k) {
+        for (int i = 1; i < ESCOLA_size; i++) {
+          if (has_been_signed) break;
+          Escola *escola = &escola_array[i];
+          for (int z = 0; z < escola->size; z++) {
+            if (escola->signed_to[z] == 0 && escola->pref[z] == k) {
+              escola->signed_to[z] = j;
+              professor->signed_to = i;
+              has_been_signed = true;
+            }
+          }
+        }
+      }
     }
   }
-  printf("Numero de professor sem trabalho%d\n", aux_counter);
-
-
 }
 
-int main(int argc, char **argv)
-{
+int main(int argc, char **argv){
   if (argc < 2) {
     fprintf(stderr, "ERROR: not enough arguments provided\n");
     usage(stderr);
@@ -567,11 +458,7 @@ int main(int argc, char **argv)
   }
 
   generate_graph(content);
-
   match_graphs();
-  // print_professor_array();
-
-  printf("---------------\n");
   print_escola_array();
 
   free(content);
