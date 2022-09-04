@@ -177,7 +177,7 @@ void print_professor_array(void){
   }
 }
 
-// Printa a array de escolas
+// Printa a array de escolas e quantidade de professores alocados
 void print_escola_array(void){
   printf("------------------------------------------------\n");
   printf("Alocacao de professores\n");

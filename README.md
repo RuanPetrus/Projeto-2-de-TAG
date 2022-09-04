@@ -6,6 +6,7 @@ Considere para efeito deste projeto que uma determinada unidade da federação f
 Um arquivo entradaProj2TAG.txt com as indicações de código do professor, habilitações e preferências de escolas, bem como das escolas com suas preferências em termos de habilitações dos professores é fornecido como entrada. Uma versão pública do artigo de (Abraham, Irving & Manlove, 2007) é fornecida para leitura.
 
 ## Como rodar o programa
+### Linux
 Compile e depois rode o programa nos dados de entrada:
 ```sh
 make
@@ -14,6 +15,12 @@ make
 Ou rode direto com o comando:
 ```sh
 make run
+```
+### Windows
+Compile com o gcc e rode com o arquivo de entrada
+```sh
+gcc -std=c11 -o allocation_optmizer main.c
+./allocation_optmizer entradaProj2TAG.txt
 ```
 
 ## Referencias
